@@ -1,70 +1,75 @@
-# Getting Started with Create React App
+# Vitoko’s Coffee - Frontend
+Aplicación web basica construida con React.js, Next.js y Tailwind CSS
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+## 📝 Descripción General
 
-## Available Scripts
+Vitoko’s Coffee es una cafetería que ofrece cafés especiales, tés, pastelería y snacks. Con este repositorio podrás levantar el frontend que consume la API y ofrece una interfaz de usuario.
 
-In the project directory, you can run:
 
-### `npm start`
+## 🚀 Prerrequisitos
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+Antes de comenzar necesitas:
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+* [Node.js](https://nodejs.org/) (v16 o superior)
+* [npm](https://npmjs.com/) o [yarn](https://yarnpkg.com/)
+* [MySQL 8.0](https://dev.mysql.com/downloads/mysql/)
 
-### `npm test`
+---
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+## 🛠️ Instalación y Configuración
 
-### `npm run build`
+### 1. Clonar el repositorio
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+```bash
+git clone https://github.com/VitokoUcn/ayudantia-taller2-front.git
+cd vitoko-coffee (o el nombre que tenga la carpeta)
+```
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+### 2. Configurar el **Frontend**
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+1. En otro terminal, desde la raíz del repo, entra al directorio del frontend:
 
-### `npm run eject`
+   ```bash
+   cd Carpetafrontend
+   ```
+2. Instala dependencias:
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+   ```bash
+   npm install
+   ```
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+3. Inicia la aplicación Next.js:
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+   ```bash
+   npm run dev
+   ```
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
 
-## Learn More
+---
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+## ⚙️ Scripts Disponibles
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+### Frontend (carpeta `frontend/`)
 
-### Code Splitting
+* `npm run dev` — App Next.js en desarrollo.
+* `npm run build` — Genera la versión de producción.
+* `npm start` — Sirve la versión de producción.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+---
 
-### Analyzing the Bundle Size
+## 📡 Uso Básico
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+1. Levanta el backend:
 
-### Making a Progressive Web App
+   ```bash
+   cd Carpetabackend && npm run dev
+   ```
+2. Levanta el frontend:
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+   ```bash
+   cd Carpetafrontend && npm run dev
+   ```
+3. Abre el navegador en:
 
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+   * Backend API: `http://localhost:3000/api`
+   * Frontend Web: `http://localhost:3001`
