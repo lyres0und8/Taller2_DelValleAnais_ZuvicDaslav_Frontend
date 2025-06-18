@@ -1,13 +1,15 @@
-// src/components/Productos.jsx
-import React, { useState, useEffect } from 'react';
-// Importamos React y los hooks useState (para manejar estado local) y useEffect (para efectos secundarios)
+import React, { useState, useEffect, useCallback } from 'react';
+// Importamos React y los hooks useState (para manejar estado local) 
+// useEffect (para ejecutar efectos al montar o actualizar el componente)
+// y useCallback (para optimizar funciones que dependen de estado)
 
 // Componente "Productos":
 // Permite listar, crear, editar, deshabilitar productos y ver estadísticas de ventas recientes y anuales.
+// Presenta una interfaz completa con filtros, estadísticas y formularios para gestión de productos.
 export default function Productos() {
   // URL base de la API para productos.
-  // Create React App reenviará '/api/producto' a 'http://localhost:3000/api/producto' en desarrollo.
-  const API = '/api/producto';
+  // En desarrollo, CRA reenviará '/api/producto' a 'http://localhost:3000/api/producto'
+  const API = "http://localhost:3001/producto";
 
   // Estado local del componente:
   // - productos: lista de productos disponibles
@@ -21,8 +23,9 @@ export default function Productos() {
   const [form, setForm]             = useState({ id: '', name: '', price: '', stock: '' });
   const [error, setError]           = useState('');
 
-  // 12. Función para cargar productos disponibles desde el backend (GET /api/producto?disponible=true)
-  const loadAvailable = async () => {
+  // Función para cargar productos disponibles desde el backend.
+  // Realiza fetch a la ruta '/api/producto?disponible=true' para obtener solo productos activos.
+  const loadAvailable = useCallback(async () => {
     try {
       setError('');
       const res = await fetch(`${API}?disponible=true`);
@@ -34,10 +37,11 @@ export default function Productos() {
       setError('No se pudo cargar productos disponibles.');
       setProductos([]);
     }
-  };
+  }, [API]);
 
-  // 13. Función para cargar productos vendidos recientemente en la semana (GET /api/producto/vendidos/estaSemana)
-  const loadRecentSold = async () => {
+  // Función para cargar productos vendidos recientemente en la semana.
+  // Realiza fetch a la ruta '/api/producto/sold/estaSemana' para obtener estadísticas de ventas.
+  const loadRecentSold = useCallback(async () => {
     try {
       setError('');
       const res = await fetch(`${API}/sold/estaSemana`);
@@ -49,10 +53,11 @@ export default function Productos() {
       setError('No se pudo cargar productos vendidos esta semana.');
       setRecentSold([]);
     }
-  };
+  }, [API]);
 
-  // 15. Función para obtener la cantidad de productos vendidos en el año actual (GET /api/producto/vendidos/añoActual)
-  const loadYearCount = async () => {
+  // Función para obtener la cantidad de productos vendidos en el año actual.
+  // Realiza fetch a la ruta '/api/producto/vendidos/añoActual' para obtener estadísticas anuales.
+  const loadYearCount = useCallback(async () => {
     try {
       setError('');
       const res = await fetch(`${API}/vendidos/añoActual`);
@@ -64,15 +69,17 @@ export default function Productos() {
       setError('No se pudo cargar conteo de ventas anual.');
       setYearCount(null);
     }
-  };
+  }, [API]);
 
-  // Hook que se ejecuta al montar el componente para cargar la lista de productos disponibles
+  // Hook que se ejecuta al montar el componente para cargar la lista de productos disponibles.
+  // Se ejecuta una vez al montar y cada vez que loadAvailable cambie.
   useEffect(() => {
     loadAvailable();
-  }, []);
+  }, [loadAvailable]);
 
-  // 1 & 4. Maneja la creación (POST) o edición (PUT) de un producto según form.id.
-  // Envía name, price y stock en el cuerpo de la petición.
+  // Función que maneja el envío del formulario.
+  // Decide si crea (POST) o actualiza (PUT) en base a la presencia de form.id.
+  // Envía name, price y stock al backend.
   const handleSubmit = async e => {
     e.preventDefault();
     try {
@@ -98,7 +105,8 @@ export default function Productos() {
     }
   };
 
-  // 3. Función para deshabilitar (eliminar) un producto (DELETE /api/producto/:id)
+  // Función para deshabilitar (eliminar) un producto en el servidor.
+  // Llama a DELETE /api/producto/:id y recarga la lista.
   const handleDelete = async id => {
     try {
       setError('');
@@ -111,7 +119,8 @@ export default function Productos() {
     }
   };
 
-  // 4. Función para actualizar el precio de un producto (PUT /api/producto/:id)
+  // Función para actualizar el precio de un producto.
+  // Solicita nuevo precio al usuario y actualiza mediante PUT /api/producto/:id.
   const handleUpdatePrice = async id => {
     const p = prompt('Nuevo precio:');
     if (!p) return;
@@ -130,7 +139,8 @@ export default function Productos() {
     }
   };
 
-  // 14. Función para incrementar el stock de un producto (PUT /api/producto/:id/stock)
+  // Función para incrementar el stock de un producto.
+  // Solicita cantidad al usuario y actualiza mediante PUT /api/producto/:id/stock.
   const handleIncStock = async id => {
     const s = prompt('Incrementar stock en:');
     if (!s) return;
@@ -149,12 +159,12 @@ export default function Productos() {
     }
   };
 
-  // Renderizado de la interfaz:
-  // - Muestra errores si los hay
-  // - Botones para filtrar acciones (disponibles, vendidos esta semana, total anual)
-  // - Tabla de productos con acciones
-  // - Sección de ventas recientes y conteo anual
-  // - Formulario para registrar o editar productos
+  // Renderizado de la UI:
+  // - Muestra mensaje de error si existe.
+  // - Botones para filtrar acciones (disponibles, vendidos esta semana, total anual).
+  // - Tabla de productos con datos y botones de acción.
+  // - Sección de ventas recientes y conteo anual.
+  // - Formulario para registrar o editar productos.
   return (
     <div>
       {error && <div className="mb-4 text-red-600">{error}</div>}
@@ -182,19 +192,19 @@ export default function Productos() {
         </thead>
         <tbody>
           {productos.map(p => (
-            <tr key={p.id} className="border-t">
-              <td className="p-2">{p.id}</td>
-              <td className="p-2">{p.name}</td>
-              <td className="p-2">{p.price}</td>
+            <tr key={p.productoID} className="border-t">
+              <td className="p-2">{p.productoID}</td>
+              <td className="p-2">{p.nombre}</td>
+              <td className="p-2">{p.precio}</td>
               <td className="p-2">{p.stock}</td>
               <td className="p-2 space-x-1">
-                <button onClick={() => handleUpdatePrice(p.id)} className="px-2 py-1 bg-yellow-400 text-white rounded">
+                <button onClick={() => handleUpdatePrice(p.productoID)} className="px-2 py-1 bg-yellow-400 text-white rounded">
                   💲
                 </button>
-                <button onClick={() => handleIncStock(p.id)} className="px-2 py-1 bg-green-500 text-white rounded">
+                <button onClick={() => handleIncStock(p.productoID)} className="px-2 py-1 bg-green-500 text-white rounded">
                   ➕
                 </button>
-                <button onClick={() => handleDelete(p.id)} className="px-2 py-1 bg-red-500 text-white rounded">
+                <button onClick={() => handleDelete(p.productoID)} className="px-2 py-1 bg-red-500 text-white rounded">
                   🗑
                 </button>
               </td>

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 // Importamos React y los hooks useState (para manejar estado local) 
 // y useEffect (para ejecutar efectos al montar o actualizar el componente)
 
@@ -8,7 +8,7 @@ import React, { useState, useEffect } from 'react';
 export default function Clientes() {
   // URL base de la API para clientes.
   // En desarrollo, CRA reenviará '/api/cliente' a 'http://localhost:3000/api/cliente'
-  const API = '/api/cliente';
+  const API = "http://localhost:3001/clientes";
 
   // Estado local del componente:
   // - clientes: arreglo con los datos de clientes obtenidos del servidor
@@ -22,7 +22,7 @@ export default function Clientes() {
 
   // Función para obtener clientes del backend según el filtro seleccionado.
   // Realiza fetch a la ruta '/api/cliente' con query string opcional '?type=1' o '?type=2'.
-  const loadClients = async () => {
+  const loadClients = useCallback(async () => {
     try {
       setError('');
       let url = API;
@@ -36,13 +36,13 @@ export default function Clientes() {
       setError('No se pudieron cargar los clientes.');
       setClientes([]);
     }
-  };
+  }, [filter, API]);
 
   // Hook que se ejecuta al montar el componente y cada vez que 'filter' cambie,
   // para recargar la lista de clientes.
   useEffect(() => {
     loadClients();
-  }, [filter]);
+  }, [loadClients]);
 
   // Función que maneja el envío del formulario.
   // Decide si crea (POST) o actualiza (PUT) en base a la presencia de form.id.

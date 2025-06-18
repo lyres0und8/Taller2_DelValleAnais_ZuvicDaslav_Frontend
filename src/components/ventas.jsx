@@ -1,32 +1,48 @@
-
-import React, { useState } from 'react';
-// Importamos React y el hook useState para manejar el estado local del componente
-
+import React, { useState, useCallback, useEffect } from "react";
+// Importamos React y los hooks useState (para manejar estado local), 
+// useEffect (para ejecutar efectos al montar o actualizar el componente)
+// y useCallback (para optimizar funciones que dependen de estado)
 
 // Componente "Ventas":
 // Permite registrar nuevas ventas y consultar ventas existentes por cliente y fecha.
+// Presenta formularios separados para registro y consulta, y una tabla para mostrar resultados.
 export default function Ventas() {
 
   // URL base de la API para ventas.
-  // Con Create React App en desarrollo, '/api/ventas' se proxy a 'http://localhost:3000/api/ventas'.
-  const API = '/api/ventas';
+  // En desarrollo, CRA proxy '/api/ventas' a 'http://localhost:3000/api/ventas'.
+  const API = "http://localhost:3001/venta";
 
-  // Estado local:
+  // Estado local del componente:
   // - saleForm: datos del formulario para nueva venta (clienteId, items en JSON y fecha)
-  // - results: array de ventas obtenidas tras consulta
+  // - results: array de ventas obtenidas tras consulta por cliente y fecha
+  // - error: mensaje de error en caso de fallo en peticiones
   const [saleForm, setSaleForm] = useState({
     clienteId: '',
     items: '[{"id":"1","cantidad":1,"precio":0}]',
     fecha: ''
   });
   const [results, setResults] = useState([]);
+  const [error, setError] = useState('');
 
-  // 7. Función para registrar una nueva venta
-  // Envía POST a /api/ventas con clienteId y array de productos (parsed del JSON)
-  const handleNewSale = async e => {
+  // useEffect para ejecutar código cuando el componente se monta
+  useEffect(() => {
+    // Código que se ejecuta al montar el componente
+    console.log('Componente Ventas montado');
+    
+    // Cleanup function (opcional) - se ejecuta al desmontar el componente
+    return () => {
+      console.log('Componente Ventas desmontado');
+    };
+  }, []); // Array vacío significa que solo se ejecuta una vez al montar
+
+  // Función para registrar una nueva venta en el sistema.
+  // Envía POST a /api/ventas con clienteId y array de productos (parsed del JSON).
+  // Limpia el formulario tras éxito y maneja errores apropiadamente.
+  const handleNewSale = useCallback(async e => {
     e.preventDefault();
     try {
-      await fetch(API, {
+      setError('');
+      const res = await fetch(API, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -34,46 +50,53 @@ export default function Ventas() {
           productos: JSON.parse(saleForm.items)
         })
       });
+      if (!res.ok) throw new Error(res.statusText);
       alert('Venta registrada con éxito');
-      setSaleForm(form => ({ ...form, clienteId: '', items: '[]' }));
+      setSaleForm(form => ({ ...form, clienteId: '', items: '[{"id":"1","cantidad":1,"precio":0}]' }));
     } catch (err) {
       console.error(err);
-      alert('Error registrando la venta');
+      setError('Error registrando la venta.');
     }
-  };
+  }, [API, saleForm.clienteId, saleForm.items]);
 
-  // 8. Función para consultar ventas por cliente y fecha
-  // Construye URL GET /api/ventas/cliente/:clienteId/fecha/:fecha y guarda el resultado en 'results'
-  const handleQuery = async e => {
+  // Función para consultar ventas por cliente y fecha específica.
+  // Construye URL GET /api/ventas/cliente/:clienteId/fecha/:fecha y guarda el resultado en 'results'.
+  // Valida que tanto cliente como fecha estén presentes antes de realizar la consulta.
+  const handleQuery = useCallback(async e => {
     e.preventDefault();
     const { clienteId, fecha } = saleForm;
     if (!clienteId || !fecha) {
-      return alert('Completa cliente y fecha');
+      setError('Completa cliente y fecha para realizar la consulta.');
+      return;
     }
-    // construye la URL con path params YYYY-MM-DD
-    const url = `${API}/cliente/${clienteId}/fecha/${fecha}`;
-    console.log('Fetching URL:', url);
     try {
+      setError('');
+      // construye la URL con path params YYYY-MM-DD
+      const url = `${API}/cliente/${clienteId}/fecha/${fecha}`;
+      console.log('Fetching URL:', url);
       const res = await fetch(url);
       if (!res.ok) {
         const text = await res.text();
         console.error('Fetch failed:', res.status, text);
-        return alert(`Error ${res.status}: ${text}`);
+        throw new Error(`${res.status}: ${text}`);
       }
       const data = await res.json();
       setResults(data);
     } catch (err) {
       console.error('GET error:', err);
-      alert('Error consultando las ventas');
+      setError('Error consultando las ventas.');
+      setResults([]);
     }
-  };
+  }, [API, saleForm]);
 
-  // Renderizado de la interfaz:
-  // - Formulario para registrar ventas
-  // - Formulario para consultar ventas por cliente y fecha
-  // - Tabla para mostrar resultados de la consulta
+  // Renderizado de la UI:
+  // - Muestra mensaje de error si existe.
+  // - Formulario para registrar ventas con clienteId y productos en JSON.
+  // - Formulario para consultar ventas por cliente y fecha.
+  // - Tabla para mostrar resultados de la consulta con detalles de venta.
   return (
     <div>
+      {error && <div className="mb-4 text-red-600">{error}</div>}
       <h2 className="text-xl font-semibold mb-4">Registrar Venta</h2>
       <form onSubmit={handleNewSale} className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
         <input
